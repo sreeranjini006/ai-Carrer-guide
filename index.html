@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Guidance Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* --- Background Image --- */
+body {
+  background-image: url('https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=1600');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 0;
+}
+
+/* Particle canvas */
+#bg-canvas {
+  position: fixed;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  z-index: -1;
+}
+
+/* --- Container & Solid Glow --- */
+.container {
+  background:#fff;
+  padding:40px;
+  border-radius:20px;
+  width:500px;
+  max-width:95%;
+  text-align:center;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  animation:fadeIn 1s ease-in;
+  position: relative;
+  z-index:1;
+}
+.container::before {
+  content:"";
+  position:absolute;
+  top:-10px; left:-10px; right:-10px; bottom:-10px;
+  border-radius:25px;
+  background: rgba(78, 115, 223, 0.4); /* Solid blue glow */
+  filter: blur(30px);
+  z-index: -1;
+}
+
+/* --- Existing Styles --- */
+* { box-sizing: border-box; margin:0; padding:0; font-family: 'Poppins', sans-serif; }
+body { display:flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:50px 0; }
+h1 { margin-bottom:15px; color:#4e73df; }
+p { color:#555; margin-bottom:20px; }
+select, button { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:16px; transition:0.3s; }
+select:hover { border-color:#4e73df; }
+button { background:#4e73df; color:#fff; border:none; cursor:pointer; font-weight:600; }
+button:hover { background:#2e59d9; transform:scale(1.05); }
+
+.result { margin-top:20px; display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
+.career-card { background:#f1f5f9; padding:15px; border-radius:12px; width:calc(50% - 10px); cursor:pointer; transition:0.3s; box-shadow:0 5px 15px rgba(0,0,0,0.1); text-align:center; }
+.career-card:hover { background:#4e73df; color:#fff; transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.2); }
+
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
+.modal-content { background:#fff; padding:30px; border-radius:15px; max-width:400px; text-align:left; position:relative; }
+.close { position:absolute; top:10px; right:15px; cursor:pointer; font-weight:bold; font-size:20px; color:#333; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+/* Option Card Styles */
+.option-container { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-bottom:10px; }
+.option-card { cursor:pointer; padding:10px 15px; border-radius:30px; border:1px solid #ccc; display:flex; align-items:center; transition:0.3s; user-select:none; }
+.option-card:hover { border-color:#4e73df; }
+.option-circle { width:16px; height:16px; border-radius:50%; border:2px solid #4e73df; margin-right:10px; transition:0.3s; flex-shrink:0; }
+.option-card.selected { background:#4e73df; color:#fff; border-color:#4e73df; }
+.option-card.selected .option-circle { background:#fff; border:2px solid #fff; }
+</style>
+</head>
+<body>
+
+<!-- Particle Background -->
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+  <h1>AI Career Guidance Pro</h1>
+  <p>Select your skills, interests, and preferred work style:</p>
+
+  <p><strong>Skills:</strong></p>
+  <div id="skill-options" class="option-container">
+    <div class="option-card" onclick="toggleSkill(this,'Programming')"><div class="option-circle"></div>Programming</div>
+    <div class="option-card" onclick="toggleSkill(this,'Design')"><div class="option-circle"></div>Design</div>
+    <div class="option-card" onclick="toggleSkill(this,'Marketing')"><div class="option-circle"></div>Marketing</div>
+    <div class="option-card" onclick="toggleSkill(this,'Writing')"><div class="option-circle"></div>Writing</div>
+    <div class="option-card" onclick="toggleSkill(this,'Management')"><div class="option-circle"></div>Management</div>
+    <div class="option-card" onclick="toggleSkill(this,'Science')"><div class="option-circle"></div>Science</div>
+  </div>
+
+  <p><strong>Interests:</strong></p>
+  <div id="interest-options" class="option-container">
+    <div class="option-card" onclick="toggleInterest(this,'Technology')"><div class="option-circle"></div>Technology</div>
+    <div class="option-card" onclick="toggleInterest(this,'Business')"><div class="option-circle"></div>Business</div>
+    <div class="option-card" onclick="toggleInterest(this,'Arts')"><div class="option-circle"></div>Arts</div>
+    <div class="option-card" onclick="toggleInterest(this,'Healthcare')"><div class="option-circle"></div>Healthcare</div>
+    <div class="option-card" onclick="toggleInterest(this,'Research')"><div class="option-circle"></div>Research</div>
+  </div>
+
+  <label><strong>Preferred Work Style:</strong></label>
+  <select id="workstyle">
+    <option value="">--Select Work Style--</option>
+    <option value="Team">Team-oriented</option>
+    <option value="Independent">Independent</option>
+    <option value="Flexible">Flexible/Remote</option>
+  </select>
+
+  <button onclick="suggestCareer()">Get Career Suggestions</button>
+  <div id="result" class="result"></div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc"></p>
+  </div>
+</div>
+
+<script>
+// Career data
+const careers = {
+  "Programming":["Software Developer","AI Engineer","Web Developer","Data Analyst"],
+  "Design":["Graphic Designer","UI/UX Designer","Animator","Product Designer"],
+  "Marketing":["Digital Marketer","SEO Specialist","Content Strategist","Social Media Manager"],
+  "Writing":["Author","Content Writer","Copywriter","Technical Writer"],
+  "Management":["Project Manager","HR Manager","Operations Manager"],
+  "Science":["Research Scientist","Lab Technician","Biotechnologist","Computer Scientist"],
+  "Technology":["AI Engineer","Web Developer","Software Developer","Data Analyst"],
+  "Business":["Tech Entrepreneur","Project Manager","HR Manager","Digital Marketer"],
+  "Arts":["Graphic Designer","Animator","UI/UX Designer","Author"],
+  "Healthcare":["Doctor","Nurse","Physician Assistant","Biotechnologist"],
+  "Research":["Research Scientist","Lab Technician","Computer Scientist","AI Engineer"]
+};
+
+const careerDescriptions = {
+  "Software Developer":"Develops software applications for computers or mobile devices.",
+  "AI Engineer":"Designs and implements AI systems and models.",
+  "Web Developer":"Builds and maintains websites and web applications.",
+  "Data Analyst":"Analyzes data to help businesses make decisions.",
+  "Graphic Designer":"Creates visual designs for print or digital media.",
+  "UI/UX Designer":"Designs user-friendly interfaces and experiences.",
+  "Animator":"Produces animations for media and entertainment.",
+  "Product Designer":"Designs and improves products for users.",
+  "Digital Marketer":"Promotes products/services using online channels.",
+  "SEO Specialist":"Optimizes websites for search engines.",
+  "Content Strategist":"Plans and manages content for marketing.",
+  "Social Media Manager":"Manages social media profiles and campaigns.",
+  "Author":"Writes books or other literary works.",
+  "Content Writer":"Creates written content for websites or media.",
+  "Copywriter":"Writes persuasive marketing content.",
+  "Technical Writer":"Creates manuals and technical documentation.",
+  "Project Manager":"Oversees projects from start to finish.",
+  "HR Manager":"Manages human resources and employee relations.",
+  "Operations Manager":"Manages daily business operations.",
+  "Research Scientist":"Conducts experiments to advance knowledge.",
+  "Lab Technician":"Performs lab tests and assists scientists.",
+  "Biotechnologist":"Applies biology in technology and innovation.",
+  "Computer Scientist":"Researches and develops new computing technologies.",
+  "Tech Entrepreneur":"Starts and manages tech-based businesses.",
+  "Doctor":"Provides medical care to patients.",
+  "Nurse":"Assists in patient care and treatment.",
+  "Physician Assistant":"Supports doctors in medical tasks."
+};
+
+let selectedSkills = [];
+let selectedInterests = [];
+
+function toggleSkill(card, skill){
+  card.classList.toggle("selected");
+  if(selectedSkills.includes(skill)) selectedSkills = selectedSkills.filter(s=>s!==skill);
+  else selectedSkills.push(skill);
+}
+function toggleInterest(card, interest){
+  card.classList.toggle("selected");
+  if(selectedInterests.includes(interest)) selectedInterests = selectedInterests.filter(i=>i!==interest);
+  else selectedInterests.push(interest);
+}
+
+function suggestCareer(){
+  const workstyle=document.getElementById("workstyle").value;
+  const resultDiv=document.getElementById("result");
+  if(selectedSkills.length===0 || selectedInterests.length===0){
+    resultDiv.innerHTML="<p>Please select at least one skill and interest!</p>";
+    return;
+  }
+  let suggested=[];
+  selectedSkills.forEach(skill=>selectedInterests.forEach(interest=>{
+    if(careers[skill]) suggested=suggested.concat(careers[skill]);
+    if(careers[interest]) suggested=suggested.concat(careers[interest]);
+  }));
+  if(workstyle==="Independent") suggested=suggested.filter(c=>!["Project Manager","HR Manager","Social Media Manager"].includes(c));
+  if(workstyle==="Team") suggested=suggested.filter(c=>!["Author","Content Writer","Animator"].includes(c));
+  suggested=[...new Set(suggested)];
+  suggested = shuffleArray(suggested).slice(0,3);
+  resultDiv.innerHTML="";
+  suggested.forEach(career=>{
+    const card=document.createElement("div");
+    card.className="career-card";
+    card.innerText=career;
+    card.onclick=()=>showModal(career,careerDescriptions[career]||"No description available.");
+    resultDiv.appendChild(card);
+  });
+}
+
+function shuffleArray(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+// Modal
+const modal=document.getElementById("modal");
+const modalTitle=document.getElementById("modal-title");
+const modalDesc=document.getElementById("modal-desc");
+function showModal(title,desc){ modalTitle.innerText=title; modalDesc.innerText=desc; modal.style.display="flex"; }
+function closeModal(){ modal.style.display="none"; }
+window.onclick=e=>{if(e.target===modal) closeModal();}
+
+// Particle animation
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+function initParticles(num=80){
+  particles = [];
+  for(let i=0;i<num;i++){
+    particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, radius:Math.random()*2+1, dx:(Math.random()-0.5)*0.5, dy:(Math.random()-0.5)*0.5});
+  }
+}
+initParticles();
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='rgba(78,115,223,0.6)';
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fill();
+    p.x += p.dx; p.y += p.dy;
+    if(p.x>canvas.width)p.x=0; if(p.x<0)p.x=canvas.width;
+    if(p.y>canvas.height)p.y=0; if(p.y<0)p.y=canvas.height;
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+
+</body>
+</html>
